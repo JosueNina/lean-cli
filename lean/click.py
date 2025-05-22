@@ -23,6 +23,8 @@ from lean.models.errors import MoreInfoError
 from lean.models.logger import Option
 from lean.models.errors import AuthenticationError
 
+import tempfile
+
 
 def get_whoami_message() -> str:
     """
@@ -58,6 +60,28 @@ def get_whoami_message() -> str:
     member = next(m for m in personal_organization.members if m.isAdmin)
 
     return f"logged in as {member.name} ({member.email})"
+
+def get_disk_space_info(path: Path) -> str:
+    import os
+    try:
+        if os.name == 'posix':  # macOS y Linux
+            stat = os.statvfs(path)
+            total = stat.f_blocks * stat.f_frsize
+            free = stat.f_bfree * stat.f_frsize
+            used = total - free
+        else:  # Windows
+            import shutil
+            usage = shutil.disk_usage(path)
+            total, used, free = usage.total, usage.used, usage.free
+
+        return (
+            f"Space in temporary location - "
+            f"Total: {total / (1024 ** 3):.2f} GB, "
+            f"Used: {used / (1024 ** 3):.2f} GB, "
+            f"Free: {free / (1024 ** 3):.2f} GB"
+        )
+    except Exception as e:
+        return f"Error getting disk space: {str(e)}"
 
 class VerboseOption(ClickOption):
     def __init__(self, *args, **kwargs):
@@ -131,11 +155,21 @@ class VerboseOption(ClickOption):
         except:
             docker_version = "Not installed"
 
+        try:
+            temp_dir = Path(tempfile.gettempdir()).resolve()
+            space_info = get_disk_space_info(temp_dir)
+        except:
+            temp_dir = ""
+            space_info = ""
+
+
         logger.debug(f"Context information:\n" +
                      hostname +
                      username +
                      f"  Python version: {python_version}\n"
                      f"  OS: {platform()}\n"
+                     f"  Temporary directory: {temp_dir}\n"
+                     f"  {space_info}\n"
                      f"  Lean CLI version: {lean_cli_version}\n"
                      f"  .NET version: {dotnet_version}\n"
                      f"  VS Code version: {vscode_version}\n"
