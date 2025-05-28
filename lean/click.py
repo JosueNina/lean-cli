@@ -23,8 +23,6 @@ from lean.models.errors import MoreInfoError
 from lean.models.logger import Option
 from lean.models.errors import AuthenticationError
 
-import tempfile
-
 
 def get_whoami_message() -> str:
     """
@@ -62,17 +60,10 @@ def get_whoami_message() -> str:
     return f"logged in as {member.name} ({member.email})"
 
 def get_disk_space_info(path: Path) -> str:
-    import os
+    import shutil
     try:
-        if os.name == 'posix':  # macOS y Linux
-            stat = os.statvfs(path)
-            total = stat.f_blocks * stat.f_frsize
-            free = stat.f_bfree * stat.f_frsize
-            used = total - free
-        else:  # Windows
-            import shutil
-            usage = shutil.disk_usage(path)
-            total, used, free = usage.total, usage.used, usage.free
+        usage = shutil.disk_usage(str(path))
+        total, used, free = usage.total, usage.used, usage.free
 
         return (
             f"Space in temporary location - "
@@ -156,7 +147,7 @@ class VerboseOption(ClickOption):
             docker_version = "Not installed"
 
         try:
-            temp_dir = Path(tempfile.gettempdir()).resolve()
+            temp_dir = container.temp_manager.create_temporary_directory().parent
             space_info = get_disk_space_info(temp_dir)
         except:
             temp_dir = ""

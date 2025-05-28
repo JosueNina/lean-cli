@@ -10,12 +10,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from lean.components.util.temp_manager import TempManager
+from unittest import mock
 
 
 def test_create_temporary_directory_creates_empty_directory() -> None:
-    temp_manager = TempManager()
+    temp_manager = TempManager(mock.Mock())
 
     path = temp_manager.create_temporary_directory()
 
@@ -24,13 +24,13 @@ def test_create_temporary_directory_creates_empty_directory() -> None:
 
 
 def test_create_temporary_directory_creates_new_directory_every_time() -> None:
-    temp_manager = TempManager()
+    temp_manager = TempManager(mock.Mock())
 
     assert temp_manager.create_temporary_directory() != temp_manager.create_temporary_directory()
 
 
 def test_delete_temporary_directories_deletes_all_previously_created_directories() -> None:
-    temp_manager = TempManager()
+    temp_manager = TempManager(mock.Mock())
 
     paths = []
     for i in range(5):
