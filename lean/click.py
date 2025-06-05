@@ -60,8 +60,8 @@ def get_whoami_message() -> str:
     return f"logged in as {member.name} ({member.email})"
 
 def get_disk_space_info(path: Path) -> str:
-    import shutil
     try:
+        import shutil
         usage = shutil.disk_usage(str(path))
         total, used, free = usage.total, usage.used, usage.free
 
