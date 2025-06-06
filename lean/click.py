@@ -61,8 +61,8 @@ def get_whoami_message() -> str:
 
 def get_disk_space_info(path: Path) -> str:
     try:
-        import shutil
-        usage = shutil.disk_usage(str(path))
+        from shutil import disk_usage
+        usage = disk_usage(str(path))
         total, used, free = usage.total, usage.used, usage.free
 
         return (

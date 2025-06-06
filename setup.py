@@ -46,7 +46,7 @@ def get_stubs_version_range() -> str:
 
 # Production dependencies
 install_requires = [
-    "click>=8.0.4",
+    "click~=8.1.8",
     "requests>=2.27.1",
     "json5>=0.9.8",
     "docker>=6.0.0",
@@ -56,7 +56,7 @@ install_requires = [
     "lxml>=4.9.0",
     "joblib>=1.1.0",
     "setuptools",
-    f"quantconnect-stubs{get_stubs_version_range()}",
+    f"quantconnect-stubs{get_stubs_version_range()}",   
     "cryptography>=41.0.4,<43.0.0",
 ]
 
